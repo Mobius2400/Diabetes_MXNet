@@ -34,4 +34,5 @@ test_data <- scale(test_data)
 predictions <- predict(model, data.matrix(test_data))
 predictions <- round(predictions)
 ## Calculate model accuracy
+
 cat("The accuracy of the model is: ")
