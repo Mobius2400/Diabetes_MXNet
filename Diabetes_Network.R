@@ -14,6 +14,11 @@ train_label <- train[,ncol(train)]
 train_data <- train[c(1:ncol(train)-1)]
 ## Normalize training data.
 train_data <- scale(train_data)
+## Process test dataset to extract parameters and labels.
+test_label <- test[,ncol(test)]
+test_data <- test[c(1:ncol(test)-1)]
+## Normalize training data.
+test_data <- scale(test_data)
 
 ## Create network model and train using MXNet:
 require(mxnet)
@@ -21,18 +26,13 @@ mx.set.seed(101)
 model <- mx.mlp(data.matrix(train_data), train_label, 
                 hidden_node=ncol(train_data), out_node=1, 
                 out_activation="rmse",
-                num.round=25, array.batch.size=15, learning.rate=0.07, momentum=0.9,
+                num.round=50, array.batch.size=15, learning.rate=0.07, momentum=0.9,
                 eval.metric=mx.metric.rmse)
-
-## Process test dataset to extract parameters and labels.
-test_label <- test[,ncol(test)]
-test_data <- test[c(1:ncol(test)-1)]
-## Normalize training data.
-test_data <- scale(test_data)
 
 ## Predict outcome using developed model:
 predictions <- predict(model, data.matrix(test_data))
 predictions <- round(predictions)
 ## Calculate model accuracy
-
-cat("The accuracy of the model is: ")
+classes <- table(predictions, test_label)
+accuracy <- ((classes["0","0"]+classes["1","1"])/nrow(test_data))*100
+cat("The accuracy of the model is: ", accuracy)
