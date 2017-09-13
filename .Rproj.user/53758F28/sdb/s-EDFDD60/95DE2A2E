@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ISLR)\n\n# Create Vector of Column Max and Min Values\nmaxs <- apply(College[,2:18], 2, max)\nmins <- apply(College[,2:18], 2, min)\n\n# Use scale() and convert the resulting matrix to a data frame\nscaled.data <- as.data.frame(scale(College[,2:18],center = mins, scale = maxs - mins))\n\n# Check out results\n# print(head(scaled.data,2))\n\n# Convert Private column from Yes/No to 1/0\nPrivate = as.numeric(College$Private)-1\ndata = cbind(Private,scaled.data)\n\nlibrary(caTools)\nset.seed(101)\n\n# Create Split (any column is fine)\nsplit = sample.split(data$Private, SplitRatio = 0.70)\n\n# Split based off of split Boolean Vector\ntrain = subset(data, split == TRUE)\ntest = subset(data, split == FALSE)\n\nfeats <- names(scaled.data)\n\n# Concatenate strings\nf <- paste(feats,collapse=' + ')\nf <- paste('Private ~',f)\n\n# Convert to formula\nf <- as.formula(f)\nmax_acc <- 0\n\nlibrary(neuralnet)\nfor(neurons in c(1:10)){\n  for(layers in c(1:10)){\n    input <- rep(neurons, layers)\n    nn <- neuralnet(f,train,hidden=c(10,10,10,10),linear.output=FALSE)\n    \n    # Compute Predictions off Test Set\n    predicted.nn.values <- compute(nn,test[2:18])\n    predicted.nn.values$net.result <- sapply(predicted.nn.values$net.result,round,digits=0)\n    predictions <- table(test$Private,predicted.nn.values$net.result)\n    \n    # Compute Accuracy of model based off Test predictions\n    correct <- predictions[1,1]+predictions[2,2]\n    wrong <- predictions[1,2]+predictions[2,1]\n    accuracy <- round((correct/(correct+wrong))*100,2)\n    cat(\"The accuracy of the model is: \", accuracy,\"\\n\")\n    plot(nn)\n    if(accuracy > max_acc){\n      max_acc <- accuracy\n    }\n  }\n}\n\ncat(\"The maximum accuracy achieved is: \",max_acc,\"\\n\")\n",
+    "created" : 1504124731365.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1819011655",
+    "id" : "95DE2A2E",
+    "lastKnownWriteTime" : 1504816457,
+    "last_content_update" : 1504816457626,
+    "path" : "C:/Users/Das/Desktop/JnJ/College_NNtest.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

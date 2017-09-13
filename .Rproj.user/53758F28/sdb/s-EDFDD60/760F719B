@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "## MXNet and Predicitve Analytics POC on Prime Indians Diabetes Database.\n## Dataset source: https://www.kaggle.com/uciml/pima-indians-diabetes-database\n\n## Load data\ndata <- read.csv(\"diabetes.csv\")\n## Split data into training and test with 70/30 ratio\nrequire(caTools)\nsplit <- sample.split(data, SplitRatio = 0.70)\ntrain <- subset(data, split == TRUE)\ntest <- subset(data, split == FALSE)\n\n## Process train dataset to extract parameters and labels.\ntrain_label <- train[,ncol(train)]\ntrain_data <- train[c(1:ncol(train)-1)]\n## Normalize training data.\ntrain_data <- scale(train_data)\n## Process test dataset to extract parameters and labels.\ntest_label <- test[,ncol(test)]\ntest_data <- test[c(1:ncol(test)-1)]\n## Normalize training data.\ntest_data <- scale(test_data)\n\n## Create network model and train using MXNet:\nrequire(mxnet)\nmx.set.seed(101)\nmodel <- mx.mlp(data.matrix(train_data), train_label,\n                hidden_node=ncol(train_data), out_node=1, \n                out_activation=\"rmse\",\n                num.round=50, array.batch.size=15, learning.rate=0.07, \n                momentum=0.9, eval.metric=mx.metric.rmse)\n\n## Predict outcome using developed model:\npredictions <- predict(model, data.matrix(test_data))\npredictions <- round(predictions)\n## Calculate model accuracy\nclasses <- table(predictions, test_label)\naccuracy <- ((classes[\"0\",\"0\"]+classes[\"1\",\"1\"])/nrow(test_data))*100\ncat(\"The accuracy of the model is: \", accuracy)\n",
+    "created" : 1503590773652.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1683236277",
+    "id" : "760F719B",
+    "lastKnownWriteTime" : 1504124863,
+    "last_content_update" : 1504124863218,
+    "path" : "~/R/Diabetes_Test/Diabetes_Network.R",
+    "project_path" : "Diabetes_Network.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
