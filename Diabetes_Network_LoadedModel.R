@@ -20,17 +20,11 @@ test_data <- test[c(1:ncol(test)-1)]
 ## Normalize training data.
 test_data <- scale(test_data)
 
-## Create network model and train using MXNet:
-require(mxnet)
-mx.set.seed(101)
-model <- mx.mlp(data.matrix(train_data), train_label,
-                hidden_node=ncol(train_data), out_node=1, 
-                out_activation="rmse",
-                num.round=50, array.batch.size=15, learning.rate=0.07, 
-                momentum=0.9, eval.metric=mx.metric.rmse)
+## Load model back
+model = mx.model.FeedForward.load("diabetes_model", 100)
 ## Predict outcome using developed model:
 predictions <- predict(model, data.matrix(test_data))
-predictions <- round(predictions)
+predictions <- round(predictions[2,])
 ## Calculate model accuracy
 classes <- table(predictions, test_label)
 accuracy <- ((classes["0","0"]+classes["1","1"])/nrow(test_data))*100
